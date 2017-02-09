@@ -1,0 +1,1 @@
+30 5 * * *  /usr/local/bin/docker start cranky_kare

@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+#------------------------------------
+#TODO Improvements
+#   Add switch -cf  --config with a path to the configFile.cfg
+#   Test the app within a cron job
+#   Move the app to a Python Alpine container
+#   Set up an internal cron job within a container
+#   Investigate how to automatically allow Google Drive usage
+#
+
+
+
 from __future__ import print_function, unicode_literals, division, absolute_import  # We require Python 2.6 or later
 
 __author__ = "Lukasz Uszko, Daniel van Dorp"
@@ -30,6 +41,8 @@ import re
 from collections import OrderedDict
 from bs4 import BeautifulSoup
 import logging
+import getopt
+
 
 import utils.logger as log_manager
 logger = log_manager.get_logger(__name__)
@@ -160,13 +173,15 @@ class FreeEBookGrabber(object):
         r = self.session.get(self.accountData.freeLearningUrl,
                              headers=self.accountData.reqHeaders, timeout=10)
         if r.status_code is not 200:
+            logger.info("Error code is {}".format(r.status_code))
             raise requests.exceptions.RequestException("http GET status code != 200")
         html = BeautifulSoup(r.text, 'html.parser')
         claimUrl = html.find(attrs={'class': 'twelve-days-claim'})['href']
         self.bookTitle = html.find('div', {'class': 'dotd-title'}).find('h2').next_element. \
             replace('\t', '').replace('\n', '').strip(' ')
         r = self.session.get(self.accountData.packtPubUrl + claimUrl,
-                             headers=self.accountData.reqHeaders, timeout=10)
+                             headers=self.accountData.reqHeaders, timeout=30)
+        logger.info("URL {}".format(self.accountData.packtPubUrl + claimUrl))
         if r.status_code is 200:
             logger.success("eBook: '{}' has been successfully grabbed!".format(self.bookTitle))
             if logEbookInfodata:
@@ -293,10 +308,15 @@ if __name__ == '__main__':
                         action="store_true")
     parser.add_argument("-m", "--mail", help="send download to emails defined in config file", default=False,
                         action="store_true")
-    
+    parser.add_argument("-cfg", "--config", action="append", dest="const_cfg", default=[], help="set config file path")
+
     args = parser.parse_args()
-    cfgFilePath = os.path.join(os.getcwd(), "configFile.cfg")
-    
+    #TODO  check configFile.cfg path for a crontab
+    #print (args.const_collection[0])
+
+    #cfgFilePath = os.path.join(os.getcwd(), "configFile.cfg")
+    cfgFilePath =os.path.join(args.const_cfg[0],"configFile.cfg")
+
     try:
         myAccount = PacktAccountData(cfgFilePath)
         grabber = FreeEBookGrabber(myAccount)
