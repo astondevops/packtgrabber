@@ -1,2 +1,1 @@
-30 5  * * *  /usr/bin/docker rm `/usr/bin/docker  ps -aq`
-31 5  * * *  /usr/bin/docker  run -v /home/hme/Drive/Library/PacktGrabber:/home/hme  packtgrabber 
+30 5  * * *  /home/hme/dev/packtgrabber/getbook.sh 
