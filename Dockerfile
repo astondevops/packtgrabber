@@ -14,5 +14,5 @@ COPY configFile.cfg /
 ADD utils /utils
 
 #ENTRYPOINT ["python3","packtPublishingFreeEbook.py","-gd", "-cfg", "."]
-CMD ["python3","packtPublishingFreeEbook.py","-gd", "-cfg", "."]
+CMD ["python3","packtPublishingFreeEbook.py","-da", "-cfg", "."]
 
